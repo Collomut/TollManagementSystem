@@ -19,6 +19,7 @@ public class OwnerView extends JFrame {
     private JComboBox<String> cmbType;
     private DefaultTableModel vehicleTableModel;
     private DefaultTableModel txTableModel;
+    private JTable            vehicleTable;
 
     private User loggedInUser;
 
@@ -30,7 +31,7 @@ public class OwnerView extends JFrame {
         setLocationRelativeTo(null);
 
         JTabbedPane tabs = new JTabbedPane();
-        tabs.add("My Vehicles",    buildVehiclePanel());
+        tabs.add("My Vehicles",     buildVehiclePanel());
         tabs.add("My Transactions", buildTxPanel());
 
         add(tabs);
@@ -42,56 +43,81 @@ public class OwnerView extends JFrame {
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JPanel form = new JPanel(new GridLayout(3, 2, 5, 5));
+        JPanel form = new JPanel(new GridLayout(4, 2, 5, 5));
         txtPlate = new JTextField();
-        cmbType  = new JComboBox<>(new String[]{"car","truck","motorbike","bus"});
+        cmbType  = new JComboBox<>(new String[]{"car", "truck", "motorbike", "bus"});
 
         form.add(new JLabel("Plate Number:")); form.add(txtPlate);
         form.add(new JLabel("Vehicle Type:")); form.add(cmbType);
 
-        JButton btnAdd    = new JButton("Register");
-        JButton btnDelete = new JButton("Delete");
-        JButton btnClear  = new JButton("Clear");
-        JPanel  buttons   = new JPanel(new FlowLayout());
-        buttons.add(btnAdd); buttons.add(btnDelete); buttons.add(btnClear);
+        JButton btnRegister = new JButton("Register");
+        JButton btnDelete   = new JButton("Delete");
+        JButton btnClear    = new JButton("Clear");
+        JPanel  buttons     = new JPanel(new FlowLayout());
+        buttons.add(btnRegister);
+        buttons.add(btnDelete);
+        buttons.add(btnClear);
         form.add(new JLabel()); form.add(buttons);
 
         vehicleTableModel = new DefaultTableModel(
             new String[]{"ID", "Plate Number", "Type"}, 0);
-        JTable vehicleTable = new JTable(vehicleTableModel);
+        vehicleTable = new JTable(vehicleTableModel);
         loadVehicles();
 
         panel.add(form, BorderLayout.NORTH);
         panel.add(new JScrollPane(vehicleTable), BorderLayout.CENTER);
 
-        btnAdd.addActionListener(e -> {
-            Vehicle v = new Vehicle(txtPlate.getText().trim(),
-                                    (String) cmbType.getSelectedItem(),
-                                    loggedInUser.getUserId());
+        
+        btnRegister.addActionListener(e -> {
+            String plate = txtPlate.getText().trim().toUpperCase();
+            if (plate.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter a plate number.");
+                return;
+            }
+            Vehicle v = new Vehicle(plate,
+                (String) cmbType.getSelectedItem(),
+                loggedInUser.getUserId());
+
             if (vehicleController.addVehicle(v)) {
-                JOptionPane.showMessageDialog(this, "Vehicle registered.");
-                loadVehicles(); txtPlate.setText("");
+                JOptionPane.showMessageDialog(this, "Vehicle registered successfully.");
+                loadVehicles();
+                txtPlate.setText("");
             } else {
-                JOptionPane.showMessageDialog(this, "Failed. Plate may already exist.");
+                JOptionPane.showMessageDialog(this,
+                    "Failed. Plate number may already exist.");
             }
         });
 
+        
         btnDelete.addActionListener(e -> {
             int row = vehicleTable.getSelectedRow();
-            if (row < 0) { JOptionPane.showMessageDialog(this, "Select a vehicle first."); return; }
-            int id = (int) vehicleTableModel.getValueAt(row, 0);
-            int confirm = JOptionPane.showConfirmDialog(this, "Delete this vehicle?");
+            if (row < 0) {
+                JOptionPane.showMessageDialog(this, "Select a vehicle first.");
+                return;
+            }
+            int id      = (int) vehicleTableModel.getValueAt(row, 0);
+            int confirm = JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to delete this vehicle?");
             if (confirm == JOptionPane.YES_OPTION) {
                 vehicleController.deleteVehicle(id);
                 loadVehicles();
+                txtPlate.setText("");
             }
         });
 
-        btnClear.addActionListener(e -> txtPlate.setText(""));
+        
+        btnClear.addActionListener(e -> {
+            txtPlate.setText("");
+            vehicleTable.clearSelection();
+        });
 
+        
         vehicleTable.getSelectionModel().addListSelectionListener(e -> {
             int row = vehicleTable.getSelectedRow();
-            if (row >= 0) txtPlate.setText((String) vehicleTableModel.getValueAt(row, 1));
+            if (row >= 0) {
+                txtPlate.setText((String) vehicleTableModel.getValueAt(row, 1));
+                cmbType.setSelectedItem(vehicleTableModel.getValueAt(row, 2));
+            }
         });
 
         return panel;
@@ -103,8 +129,9 @@ public class OwnerView extends JFrame {
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         txTableModel = new DefaultTableModel(
-            new String[]{"TXN ID", "Vehicle ID", "Booth ID", "Amount (RWF)", "Date"}, 0);
+            new String[]{"TXN ID", "Plate Number", "Booth", "Amount (RWF)", "Date"}, 0);
         JTable txTable = new JTable(txTableModel);
+        txTable.setEnabled(false); 
 
         JButton btnRefresh = new JButton("Refresh");
         loadTxHistory();
@@ -113,14 +140,18 @@ public class OwnerView extends JFrame {
         panel.add(new JScrollPane(txTable), BorderLayout.CENTER);
 
         btnRefresh.addActionListener(e -> loadTxHistory());
+
         return panel;
     }
 
+    
     private void loadVehicles() {
         vehicleTableModel.setRowCount(0);
         for (Vehicle v : vehicleController.getVehiclesByOwner(loggedInUser.getUserId())) {
             vehicleTableModel.addRow(new Object[]{
-                v.getVehicleId(), v.getPlateNumber(), v.getVehicleType()
+                v.getVehicleId(),
+                v.getPlateNumber(),
+                v.getVehicleType()
             });
         }
     }
@@ -129,8 +160,11 @@ public class OwnerView extends JFrame {
         txTableModel.setRowCount(0);
         for (Transaction t : txController.getTransactionsByOwner(loggedInUser.getUserId())) {
             txTableModel.addRow(new Object[]{
-                t.getTransactionId(), t.getVehicleId(), t.getBoothId(),
-                t.getAmountPaid(), t.getPaymentDate()
+                t.getTransactionId(),
+                t.getPlateNumber(),
+                t.getBoothName(),
+                t.getAmountPaid(),
+                t.getPaymentDate()
             });
         }
     }

@@ -8,7 +8,7 @@ import java.awt.*;
 
 public class LoginView extends JFrame {
 
-    private JTextField     txtUsername;
+    private JTextField txtUsername;
     private JPasswordField txtPassword;
     private JButton        btnLogin;
     private AuthController authController = new AuthController();
@@ -32,7 +32,7 @@ public class LoginView extends JFrame {
         panel.add(txtPassword);
 
         btnLogin = new JButton("Login");
-        panel.add(new JLabel()); // spacer
+        panel.add(new JLabel()); 
         panel.add(btnLogin);
 
         add(new JLabel("  Toll Management System", SwingConstants.CENTER), BorderLayout.NORTH);

@@ -12,12 +12,12 @@ public class TollServer {
     private static List<PrintWriter> clientWriters = new ArrayList<>();
 
     public static void main(String[] args) {
-        System.out.println("✅ Toll Server started on port " + PORT);
+        System.out.println("Toll Server started on port " + PORT);
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             while (true) {
                 
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("🔌 New client connected: " + clientSocket.getInetAddress());
+                System.out.println("New client connected: " + clientSocket.getInetAddress());
 
                
                 Thread t = new Thread(new ClientHandler(clientSocket));
@@ -33,13 +33,13 @@ public class TollServer {
         for (PrintWriter writer : clientWriters) {
             writer.println(message);
         }
-        System.out.println("📢 Broadcasted: " + message);
+        System.out.println("Broadcasted: " + message);
     }
 
     
     public static synchronized void removeClient(PrintWriter writer) {
         clientWriters.remove(writer);
-        System.out.println("❌ A client disconnected.");
+        System.out.println("A client disconnected.");
     }
 
     

@@ -20,21 +20,37 @@ public class Vehicle {
     }
 
    
-    public int getVehicleId()                   { return vehicleId; }
-    public void setVehicleId(int id)            { this.vehicleId = id; }
-
-    public String getPlateNumber()              { return plateNumber; }
-    public void setPlateNumber(String p)        { this.plateNumber = p; }
-
-    public String getVehicleType()              { return vehicleType; }
-    public void setVehicleType(String t)        { this.vehicleType = t; }
-
-    public int getOwnerId()                     { return ownerId; }
-    public void setOwnerId(int id)              { this.ownerId = id; }
-
-    public Timestamp getRegisteredAt()          { return registeredAt; }
-    public void setRegisteredAt(Timestamp t)    { this.registeredAt = t; }
-
+    public int getVehicleId(){
+    	return vehicleId;
+    	}
+    public void setVehicleId(int id){
+    	this.vehicleId = id;
+    	}
+    public String getPlateNumber(){
+    	return plateNumber;
+    	}
+    public void setPlateNumber(String p){
+    	this.plateNumber = p;
+    	}
+    public String getVehicleType(){
+    	return vehicleType;
+    	}
+    public void setVehicleType(String t){
+    	this.vehicleType = t;
+    	}
+    public int getOwnerId(){
+    	return ownerId;
+    	}
+    public void setOwnerId(int id){
+    	this.ownerId = id;
+    	}
+    public Timestamp getRegisteredAt(){
+    	return registeredAt;
+    	}
+    public void setRegisteredAt(Timestamp t){
+    	this.registeredAt = t;
+    	}
+    
     @Override
     public String toString() {
         return plateNumber + " (" + vehicleType + ")";

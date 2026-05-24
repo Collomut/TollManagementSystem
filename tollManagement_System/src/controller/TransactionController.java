@@ -9,9 +9,10 @@ import java.util.List;
 
 public class TransactionController {
 
-   
+    
     public boolean addTransaction(Transaction t) {
-        String sql = "INSERT INTO transactions (vehicle_id, booth_id, amount_paid, processed_by) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO transactions (vehicle_id, booth_id, amount_paid, processed_by) "
+                   + "VALUES (?, ?, ?, ?)";
         try {
             Connection conn = DBConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -26,10 +27,16 @@ public class TransactionController {
         }
     }
 
-   
+    
     public List<Transaction> getAllTransactions() {
         List<Transaction> list = new ArrayList<>();
-        String sql = "SELECT * FROM transactions ORDER BY payment_date DESC";
+        String sql = "SELECT t.transaction_id, v.plate_number, b.booth_name, "
+                   + "t.amount_paid, t.payment_date, u.full_name "
+                   + "FROM transactions t "
+                   + "JOIN vehicles v   ON t.vehicle_id   = v.vehicle_id "
+                   + "JOIN toll_booths b ON t.booth_id    = b.booth_id "
+                   + "JOIN users u       ON t.processed_by = u.user_id "
+                   + "ORDER BY t.payment_date DESC";
         try {
             Connection conn = DBConnection.getConnection();
             Statement st = conn.createStatement();
@@ -37,11 +44,11 @@ public class TransactionController {
             while (rs.next()) {
                 Transaction t = new Transaction();
                 t.setTransactionId(rs.getInt("transaction_id"));
-                t.setVehicleId(rs.getInt("vehicle_id"));
-                t.setBoothId(rs.getInt("booth_id"));
                 t.setAmountPaid(rs.getDouble("amount_paid"));
                 t.setPaymentDate(rs.getTimestamp("payment_date"));
-                t.setProcessedBy(rs.getInt("processed_by"));
+                t.setPlateNumber(rs.getString("plate_number"));
+                t.setBoothName(rs.getString("booth_name"));
+                t.setOperatorName(rs.getString("full_name"));
                 list.add(t);
             }
         } catch (Exception e) {
@@ -53,9 +60,13 @@ public class TransactionController {
     
     public List<Transaction> getTransactionsByOwner(int ownerId) {
         List<Transaction> list = new ArrayList<>();
-        String sql = "SELECT t.* FROM transactions t " +
-                     "JOIN vehicles v ON t.vehicle_id = v.vehicle_id " +
-                     "WHERE v.owner_id = ? ORDER BY t.payment_date DESC";
+        String sql = "SELECT t.transaction_id, v.plate_number, b.booth_name, "
+                   + "t.amount_paid, t.payment_date "
+                   + "FROM transactions t "
+                   + "JOIN vehicles v    ON t.vehicle_id = v.vehicle_id "
+                   + "JOIN toll_booths b ON t.booth_id   = b.booth_id "
+                   + "WHERE v.owner_id = ? "
+                   + "ORDER BY t.payment_date DESC";
         try {
             Connection conn = DBConnection.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -64,10 +75,10 @@ public class TransactionController {
             while (rs.next()) {
                 Transaction t = new Transaction();
                 t.setTransactionId(rs.getInt("transaction_id"));
-                t.setVehicleId(rs.getInt("vehicle_id"));
-                t.setBoothId(rs.getInt("booth_id"));
                 t.setAmountPaid(rs.getDouble("amount_paid"));
                 t.setPaymentDate(rs.getTimestamp("payment_date"));
+                t.setPlateNumber(rs.getString("plate_number"));
+                t.setBoothName(rs.getString("booth_name"));
                 list.add(t);
             }
         } catch (Exception e) {
@@ -76,7 +87,22 @@ public class TransactionController {
         return list;
     }
 
-   
+    
+    public double getRateByVehicleType(String vehicleType) {
+        String sql = "SELECT amount FROM toll_rates WHERE vehicle_type = ?";
+        try {
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, vehicleType);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getDouble("amount");
+        } catch (Exception e) {
+            System.out.println("Get rate error: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    
     public double getTotalRevenue() {
         String sql = "SELECT SUM(amount_paid) FROM transactions";
         try {

@@ -29,6 +29,6 @@ public class AuthController {
         } catch (Exception e) {
             System.out.println("Login error: " + e.getMessage());
         }
-        return null; // login failed
+        return null; 
     }
 }

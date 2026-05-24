@@ -26,10 +26,10 @@ public class TollClient {
     private void connect() {
         try {
             socket = new Socket(HOST, PORT);
-            out    = new PrintWriter(socket.getOutputStream(), true);
-            in     = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(socket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            System.out.println("✅ Connected to Toll Server.");
+            System.out.println("Connected to Toll Server.");
 
             
             Thread listenerThread = new Thread(() -> {

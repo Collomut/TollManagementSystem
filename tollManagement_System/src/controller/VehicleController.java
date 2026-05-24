@@ -71,6 +71,28 @@ public class VehicleController {
     }
 
     
+    public Vehicle getVehicleByPlate(String plateNumber) {
+        String sql = "SELECT * FROM vehicles WHERE plate_number = ?";
+        try {
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, plateNumber);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Vehicle v = new Vehicle();
+                v.setVehicleId(rs.getInt("vehicle_id"));
+                v.setPlateNumber(rs.getString("plate_number"));
+                v.setVehicleType(rs.getString("vehicle_type"));
+                v.setOwnerId(rs.getInt("owner_id"));
+                return v;
+            }
+        } catch (Exception e) {
+            System.out.println("Get vehicle by plate error: " + e.getMessage());
+        }
+        return null;
+    }
+
+   
     public boolean updateVehicle(Vehicle vehicle) {
         String sql = "UPDATE vehicles SET plate_number=?, vehicle_type=? WHERE vehicle_id=?";
         try {

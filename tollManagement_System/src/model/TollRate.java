@@ -15,14 +15,24 @@ public class TollRate {
     }
 
     
-    public int getRateId()                  { return rateId; }
-    public void setRateId(int id)           { this.rateId = id; }
-
-    public String getVehicleType()          { return vehicleType; }
-    public void setVehicleType(String t)    { this.vehicleType = t; }
-
-    public double getAmount()               { return amount; }
-    public void setAmount(double a)         { this.amount = a; }
+    public int getRateId(){
+    	return rateId;
+    	}
+    public void setRateId(int id){
+    	this.rateId = id;
+    	}
+    public String getVehicleType() {
+    	return vehicleType;
+    	}
+    public void setVehicleType(String t){
+    	this.vehicleType = t; 
+    	}
+    public double getAmount(){
+    	return amount;
+    	}
+    public void setAmount(double a) {
+    	this.amount = a;
+    	}
 
     @Override
     public String toString() {

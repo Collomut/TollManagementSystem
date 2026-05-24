@@ -17,17 +17,31 @@ public class TollBooth {
     }
 
     
-    public int getBoothId()                         { return boothId; }
-    public void setBoothId(int id)                  { this.boothId = id; }
-
-    public String getBoothName()                    { return boothName; }
-    public void setBoothName(String name)           { this.boothName = name; }
-
-    public String getLocation()                     { return location; }
-    public void setLocation(String loc)             { this.location = loc; }
-
-    public int getAssignedOperator()                { return assignedOperator; }
-    public void setAssignedOperator(int opId)       { this.assignedOperator = opId; }
+    public int getBoothId() {
+    	return boothId;
+    }
+    public void setBoothId(int id){
+    	this.boothId = id; 
+    	}
+    public String getBoothName() { 
+    	return boothName; 
+    }
+    public void setBoothName(String name){
+    	this.boothName = name;
+    }
+    public String getLocation(){
+    	return location;
+    	}
+    public void setLocation(String loc){ 
+    	this.location = loc;
+    }
+    
+    public int getAssignedOperator(){
+    	return assignedOperator;
+    }
+    public void setAssignedOperator(int opId){
+    	this.assignedOperator = opId; 
+    	}
 
     @Override
     public String toString() {
